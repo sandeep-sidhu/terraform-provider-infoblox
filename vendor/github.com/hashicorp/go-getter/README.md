@@ -222,11 +222,7 @@ None
 
 ### HTTP (`http`)
 
-#### Basic Authentication
-
-To use HTTP basic authentication with go-getter, simply prepend `username:password@` to the
-hostname in the URL such as `https://Aladdin:OpenSesame@www.example.com/index.html`. All special
-characters, including the username and password, must be URL encoded.
+None
 
 ### S3 (`s3`)
 
