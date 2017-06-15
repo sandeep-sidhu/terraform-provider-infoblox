@@ -17,40 +17,54 @@ func resourceCNAMERecord() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The name for a CNAME record in FQDN format",
+				ForceNew:    true,
 			},
 			"ref": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Unique reference to Infoblox resource",
 			},
 			"comment": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Comment for the record; maximum 256 characters",
 			},
 			"view": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "default",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "default",
+				Description: "The name of the DNS View in which the record resides",
 			},
-			//"zone": {
-			//	Type:     schema.TypeString,
-			//	Computed: true,
-			//},
+			"zone": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The name of the zone in which the record resides",
+			},
 			"ttl": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				Computed: true,
-				// Implement validator function unsigned int.
+				Type:         schema.TypeInt,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validateUnsignedInteger,
+				Description:  "The Time To Live assigned to CNAME",
 			},
 			"canonical": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Canonical name in FQDN format",
 			},
 		},
 	}
+}
+
+func validateUnsignedInteger(v interface{}, k string) (ws []string, errors []error) {
+	ttl := v.(int)
+	if ttl < 0 {
+		errors = append(errors, fmt.Errorf("%q can't be negative", k))
+	}
+	return
 }
 
 func resourceCNAMECreate(d *schema.ResourceData, m interface{}) error {
@@ -70,9 +84,6 @@ func resourceCNAMECreate(d *schema.ResourceData, m interface{}) error {
 	if v, ok := d.GetOk("view"); ok {
 		cnameRecord.View = v.(string)
 	}
-	//if v, ok := d.GetOk("zone"); ok {
-	//	cnameRecord.Zone = v.(string)
-	//}
 	if v, ok := d.GetOk("ttl"); ok {
 		ttl := v.(int)
 		cnameRecord.TTL = uint(ttl)
@@ -99,7 +110,7 @@ func resourceCNAMECreate(d *schema.ResourceData, m interface{}) error {
 
 func resourceCNAMERead(d *schema.ResourceData, m interface{}) error {
 
-	returnFields := []string{"name", "comment", "view", "ttl", "canonical"}
+	returnFields := []string{"name", "comment", "view", "ttl", "canonical", "zone"}
 
 	infobloxClient := m.(*skyinfoblox.InfobloxClient)
 	getSingleCNAMEAPI := records.NewGetCNAMERecord(d.Id(), returnFields)
@@ -117,6 +128,7 @@ func resourceCNAMERead(d *schema.ResourceData, m interface{}) error {
 	d.SetId(response.Ref)
 	d.Set("name", response.Name)
 	d.Set("comment", response.Comment)
+	d.Set("zone", response.Zone)
 	d.Set("view", response.View)
 	d.Set("ttl", response.TTL)
 	d.Set("canonical", response.Canonical)
@@ -126,10 +138,72 @@ func resourceCNAMERead(d *schema.ResourceData, m interface{}) error {
 
 func resourceCNAMEUpdate(d *schema.ResourceData, m interface{}) error {
 
+	infobloxClient := m.(*skyinfoblox.InfobloxClient)
+	hasChanges := false
+	resourceReference := d.Id()
+	var updateCNAME records.GenericRecord
+
+	if d.HasChange("comment") {
+		if v, ok := d.GetOk("comment"); ok {
+			updateCNAME.Comment = v.(string)
+		}
+		hasChanges = true
+	}
+	if d.HasChange("view") {
+		if v, ok := d.GetOk("view"); ok {
+			updateCNAME.View = v.(string)
+		}
+		hasChanges = true
+	}
+	if d.HasChange("ttl") {
+		if v, ok := d.GetOk("ttl"); ok {
+			ttl := v.(int)
+			updateCNAME.TTL = uint(ttl)
+		}
+		hasChanges = true
+	}
+	if d.HasChange("canonical") {
+		if v, ok := d.GetOk("canonical"); ok {
+			updateCNAME.Canonical = v.(string)
+		}
+		hasChanges = true
+	}
+
+	if hasChanges {
+		updateAPI := records.NewUpdateRecord(resourceReference, updateCNAME)
+		err := infobloxClient.Do(updateAPI)
+		if err != nil {
+			return fmt.Errorf("Sky Infoblox Update Error: %+v", err)
+		}
+		if updateAPI.StatusCode() != 200 {
+			return fmt.Errorf("Sky Infoblox Update Error: Invalid HTTP response code %+v returned. Response object was %+v", updateAPI.StatusCode(), updateAPI.ResponseObject())
+		}
+	}
+
 	return resourceCNAMERead(d, m)
 }
 
 func resourceCNAMEDelete(d *schema.ResourceData, m interface{}) error {
+
+	returnFields := []string{}
+	infobloxClient := m.(*skyinfoblox.InfobloxClient)
+	resourceReference := d.Id()
+	getSingleCNAMEAPI := records.NewGetCNAMERecord(resourceReference, returnFields)
+
+	err := infobloxClient.Do(getSingleCNAMEAPI)
+	if err != nil {
+		return fmt.Errorf("Sky Infoblox Delete Error when fetching resource: %+v", err)
+	}
+	if getSingleCNAMEAPI.StatusCode() == 404 {
+		d.SetId("")
+		return nil
+	}
+
+	deleteAPI := records.NewDelete(resourceReference)
+	err = infobloxClient.Do(deleteAPI)
+	if err != nil || deleteAPI.StatusCode() != 200 {
+		return fmt.Errorf("Sky Infoblox Delete - Error deleting resource %s. Return code != 204. Error: %+v", resourceReference, err)
+	}
 
 	d.SetId("")
 	return nil
