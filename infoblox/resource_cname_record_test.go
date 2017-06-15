@@ -48,13 +48,13 @@ func TestAccInfobloxCNAMEBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(cnameResourceName, "ttl", "600"),
 				),
 			},
-			/*
-				{
-					Config:      testAccInfobloxCNAMEInvalidTTLTemplate(cname, canonical),
-					ExpectError: regexp.MustCompile(`.*`),
+/*
+			{
+				Config:      testAccInfobloxCNAMEInvalidTTLTemplate(cname, canonical),
+				ExpectError: regexp.MustCompile(".*infoblox_cname_record.acctest: \"ttl\" can't be negative.*"),
 
-				},
-			*/
+			},
+*/
 		},
 	})
 }
