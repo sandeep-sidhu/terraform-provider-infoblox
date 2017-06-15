@@ -74,10 +74,6 @@ var validParentCodes = map[string]struct{}{
 	ErrCodeRead:          struct{}{},
 }
 
-type temporaryError interface {
-	Temporary() bool
-}
-
 func isNestedErrorRetryable(parentErr awserr.Error) bool {
 	if parentErr == nil {
 		return false
@@ -94,10 +90,6 @@ func isNestedErrorRetryable(parentErr awserr.Error) bool {
 
 	if aerr, ok := err.(awserr.Error); ok {
 		return isCodeRetryable(aerr.Code())
-	}
-
-	if t, ok := err.(temporaryError); ok {
-		return t.Temporary()
 	}
 
 	return isErrConnectionReset(err)

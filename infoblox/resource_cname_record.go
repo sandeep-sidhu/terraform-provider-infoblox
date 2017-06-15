@@ -76,7 +76,7 @@ func resourceCNAMECreate(d *schema.ResourceData, m interface{}) error {
 	if v, ok := d.GetOk("name"); ok {
 		cnameRecord.Name = v.(string)
 	} else {
-		return fmt.Errorf("Sky Infoblox Create Error: name argument required")
+		return fmt.Errorf("Infoblox Create Error: name argument required")
 	}
 	if v, ok := d.GetOk("comment"); ok {
 		cnameRecord.Comment = v.(string)
@@ -96,11 +96,11 @@ func resourceCNAMECreate(d *schema.ResourceData, m interface{}) error {
 
 	err := infobloxClient.Do(createAPI)
 	if err != nil {
-		return fmt.Errorf("Sky Infoblox Create Error: %+v", err)
+		return fmt.Errorf("Infoblox Create Error: %+v", err)
 	}
 
 	if createAPI.StatusCode() != 201 {
-		return fmt.Errorf("Sky Infoblox Create Error: Invalid HTTP response code %+v returned. Response object was %+v", createAPI.StatusCode(), createAPI.ResponseObject())
+		return fmt.Errorf("Infoblox Create Error: Invalid HTTP response code %+v returned. Response object was %+v", createAPI.StatusCode(), createAPI.ResponseObject())
 	}
 
 	id := strings.Replace(createAPI.GetResponse(), "\"", "", -1)
@@ -117,7 +117,7 @@ func resourceCNAMERead(d *schema.ResourceData, m interface{}) error {
 
 	err := infobloxClient.Do(getSingleCNAMEAPI)
 	if err != nil {
-		return fmt.Errorf("Sky Infoblox Read Error: %+v", err)
+		return fmt.Errorf("Infoblox Read Error: %+v", err)
 	}
 	if getSingleCNAMEAPI.StatusCode() == 404 {
 		d.SetId("")
@@ -173,10 +173,10 @@ func resourceCNAMEUpdate(d *schema.ResourceData, m interface{}) error {
 		updateAPI := records.NewUpdateRecord(resourceReference, updateCNAME)
 		err := infobloxClient.Do(updateAPI)
 		if err != nil {
-			return fmt.Errorf("Sky Infoblox Update Error: %+v", err)
+			return fmt.Errorf("Infoblox Update Error: %+v", err)
 		}
 		if updateAPI.StatusCode() != 200 {
-			return fmt.Errorf("Sky Infoblox Update Error: Invalid HTTP response code %+v returned. Response object was %+v", updateAPI.StatusCode(), updateAPI.ResponseObject())
+			return fmt.Errorf("Infoblox Update Error: Invalid HTTP response code %+v returned. Response was %+v", updateAPI.StatusCode(), updateAPI.GetResponse())
 		}
 	}
 
@@ -192,7 +192,7 @@ func resourceCNAMEDelete(d *schema.ResourceData, m interface{}) error {
 
 	err := infobloxClient.Do(getSingleCNAMEAPI)
 	if err != nil {
-		return fmt.Errorf("Sky Infoblox Delete Error when fetching resource: %+v", err)
+		return fmt.Errorf("Infoblox Delete Error when fetching resource: %+v", err)
 	}
 	if getSingleCNAMEAPI.StatusCode() == 404 {
 		d.SetId("")
@@ -202,7 +202,7 @@ func resourceCNAMEDelete(d *schema.ResourceData, m interface{}) error {
 	deleteAPI := records.NewDelete(resourceReference)
 	err = infobloxClient.Do(deleteAPI)
 	if err != nil || deleteAPI.StatusCode() != 200 {
-		return fmt.Errorf("Sky Infoblox Delete - Error deleting resource %s. Return code != 204. Error: %+v", resourceReference, err)
+		return fmt.Errorf("Infoblox Delete - Error deleting resource %s. Return code != 204. Error: %+v", resourceReference, err)
 	}
 
 	d.SetId("")
