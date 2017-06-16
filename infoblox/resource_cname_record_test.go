@@ -27,6 +27,22 @@ func TestAccInfobloxCNAMEBasic(t *testing.T) {
 		CheckDestroy: testAccInfobloxCNAMECheckDestroy,
 		Steps: []resource.TestStep{
 			{
+				Config:      testAccInfobloxCNAMENoNameCreateTemplate(canonical),
+				ExpectError: regexp.MustCompile(`required field is not set`),
+			},
+			{
+				Config:      testAccInfobloxCNAMENegativeTTLCreateTemplate(cname, canonical),
+				ExpectError: regexp.MustCompile(`can't be negative`),
+			},
+			{
+				Config:      testAccInfobloxCNAMEEmptyTemplate(),
+				ExpectError: regexp.MustCompile(`required field is not set`),
+			},
+			{
+				Config:      testAccInfobloxCNAMETooLongCommentCreateTemplate(cname, canonical),
+				ExpectError: regexp.MustCompile(`Infoblox Create Error: Invalid HTTP response code 400 returned. Response object was`),
+			},
+			{
 				Config: testAccInfobloxCNAMECreateTemplate(cname, canonical),
 				Check: resource.ComposeTestCheckFunc(
 					testAccInfobloxCNAMEExists(cname, cnameResourceName),
@@ -48,13 +64,10 @@ func TestAccInfobloxCNAMEBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(cnameResourceName, "ttl", "600"),
 				),
 			},
-/*
 			{
-				Config:      testAccInfobloxCNAMEInvalidTTLTemplate(cname, canonical),
-				ExpectError: regexp.MustCompile(".*infoblox_cname_record.acctest: \"ttl\" can't be negative.*"),
-
+				Config:      testAccInfobloxCNAMEBadViewUpdateTemplate(cname, canonical),
+				ExpectError: regexp.MustCompile("Infoblox Update Error: Invalid HTTP response code 404 returned. Response was"),
 			},
-*/
 		},
 	})
 }
@@ -62,7 +75,7 @@ func TestAccInfobloxCNAMEBasic(t *testing.T) {
 func testAccInfobloxCNAMEExists(cnameCheck, cnameResourceName string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 
-		returnFields := []string{"name", "comment", "view", "ttl", "canonical", "zone"}
+		returnFields := []string{"name", "comment", "view", "ttl", "canonical"}
 
 		rs, ok := state.RootModule().Resources[cnameResourceName]
 		if !ok {
@@ -92,7 +105,7 @@ func testAccInfobloxCNAMEExists(cnameCheck, cnameResourceName string) resource.T
 func testAccInfobloxCNAMECheckDestroy(state *terraform.State) error {
 
 	infobloxClient := testAccProvider.Meta().(*skyinfoblox.InfobloxClient)
-	returnFields := []string{"name", "comment", "view", "ttl", "canonical", "zone"}
+	returnFields := []string{"name", "comment", "view", "ttl", "canonical"}
 
 	for _, rs := range state.RootModule().Resources {
 
@@ -142,14 +155,56 @@ resource "infoblox_cname_record" "acctest" {
 `, cname, canonical)
 }
 
-func testAccInfobloxCNAMEInvalidTTLTemplate(cname, canonical string) string {
+func testAccInfobloxCNAMEBadViewUpdateTemplate(cname, canonical string) string {
+	return fmt.Sprintf(`
+resource "infoblox_cname_record" "acctest" {
+  name = "%s"
+  comment = "Terraform Acceptance Testing for CNAMEs update test"
+  canonical = "%s"
+  view = "A_VIEW_WHICH_DOESNT_EXIST"
+  ttl = 600
+}
+`, cname, canonical)
+}
+
+func testAccInfobloxCNAMETooLongCommentCreateTemplate(cname, canonical string) string {
+	return fmt.Sprintf(`
+resource "infoblox_cname_record" "acctest" {
+  name = "%s"
+  comment = "This is a very long string.... This is a very long string.... This is a very long string.... This is a very long string.... This is a very long string.... This is a very long string.... This is a very long string.... This is a very long string.... This is a very long string.... This is a very long string...."
+  canonical = "%s"
+  view = "default"
+  ttl = 600
+}
+`, cname, canonical)
+}
+
+func testAccInfobloxCNAMEEmptyTemplate() string {
+	return fmt.Sprintf(`
+resource "infoblox_cname_record" "acctest" {
+}
+`)
+}
+
+func testAccInfobloxCNAMENegativeTTLCreateTemplate(cname, canonical string) string {
 	return fmt.Sprintf(`
 resource "infoblox_cname_record" "acctest" {
   name = "%s"
   comment = "Terraform Acceptance Testing for CNAMEs update test"
   canonical = "%s"
   view = "default"
-  ttl = -600
+  ttl = -1
 }
 `, cname, canonical)
+}
+
+func testAccInfobloxCNAMENoNameCreateTemplate(canonical string) string {
+	return fmt.Sprintf(`
+resource "infoblox_cname_record" "acctest" {
+  comment = "Terraform Acceptance Testing for CNAMEs update test"
+  canonical = "%s"
+  view = "default"
+  ttl = -1
+}
+`, canonical)
 }
