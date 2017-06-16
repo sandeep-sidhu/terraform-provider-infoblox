@@ -44,6 +44,7 @@ func Provider() terraform.ResourceProvider {
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"infoblox_cname_record": resourceCNAMERecord(),
+			"infoblox_arecord": resourceARecord(),
 		},
 		ConfigureFunc: providerConfigure,
 	}
