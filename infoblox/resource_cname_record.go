@@ -38,11 +38,6 @@ func resourceCNAMERecord() *schema.Resource {
 				Default:     "default",
 				Description: "The name of the DNS View in which the record resides",
 			},
-			"zone": {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The name of the zone in which the record resides",
-			},
 			"ttl": {
 				Type:         schema.TypeInt,
 				Optional:     true,
@@ -110,10 +105,11 @@ func resourceCNAMECreate(d *schema.ResourceData, m interface{}) error {
 
 func resourceCNAMERead(d *schema.ResourceData, m interface{}) error {
 
-	returnFields := []string{"name", "comment", "view", "ttl", "canonical", "zone"}
+	returnFields := []string{"name", "comment", "view", "ttl", "canonical"}
 
 	infobloxClient := m.(*skyinfoblox.InfobloxClient)
-	getSingleCNAMEAPI := records.NewGetCNAMERecord(d.Id(), returnFields)
+	resourceReference := d.Id()
+	getSingleCNAMEAPI := records.NewGetCNAMERecord(resourceReference, returnFields)
 
 	err := infobloxClient.Do(getSingleCNAMEAPI)
 	if err != nil {
@@ -128,7 +124,6 @@ func resourceCNAMERead(d *schema.ResourceData, m interface{}) error {
 	d.SetId(response.Ref)
 	d.Set("name", response.Name)
 	d.Set("comment", response.Comment)
-	d.Set("zone", response.Zone)
 	d.Set("view", response.View)
 	d.Set("ttl", response.TTL)
 	d.Set("canonical", response.Canonical)
@@ -201,8 +196,11 @@ func resourceCNAMEDelete(d *schema.ResourceData, m interface{}) error {
 
 	deleteAPI := records.NewDelete(resourceReference)
 	err = infobloxClient.Do(deleteAPI)
-	if err != nil || deleteAPI.StatusCode() != 200 {
-		return fmt.Errorf("Infoblox Delete - Error deleting resource %s. Return code != 204. Error: %+v", resourceReference, err)
+	if err != nil {
+		return fmt.Errorf("Infobox Delete - Error deleting resource %+v", err)
+	}
+	if deleteAPI.StatusCode() != 200 {
+		return fmt.Errorf("Infoblox Delete - Error deleting resource %s - return code != 200", resourceReference)
 	}
 
 	d.SetId("")
