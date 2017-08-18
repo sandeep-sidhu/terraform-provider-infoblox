@@ -40,7 +40,7 @@ func TestAccInfobloxNSGroupAuthBasic(t *testing.T) {
 				ExpectError: regexp.MustCompile(`must not contain trailing or leading white space`),
 			},
 			{
-				Config: testAccInfobloxNSGroupAuthCreateTemplate(nsGroupAuthResourceInstance),
+				Config: testAccInfobloxNSGroupAuthCreateTemplate(nsGroupAuthNameCreate),
 				Check: resource.ComposeTestCheckFunc(
 					testAccInfobloxNSGroupAuthCheckExists(nsGroupAuthNameCreate, nsGroupAuthResourceInstance),
 					resource.TestCheckResourceAttr(nsGroupAuthResourceInstance, "name", nsGroupAuthNameCreate),
@@ -50,7 +50,7 @@ func TestAccInfobloxNSGroupAuthBasic(t *testing.T) {
 			{
 				Config: testAccInfobloxNSGroupAuthUpdateTemplate(nsGroupAuthNameUpdate),
 				Check: resource.ComposeTestCheckFunc(
-					testAccInfobloxAdminGroupCheckExists(nsGroupAuthNameUpdate, nsGroupAuthResourceInstance),
+					testAccInfobloxNSGroupAuthCheckExists(nsGroupAuthNameUpdate, nsGroupAuthResourceInstance),
 					resource.TestCheckResourceAttr(nsGroupAuthResourceInstance, "name", nsGroupAuthNameUpdate),
 					resource.TestCheckResourceAttr(nsGroupAuthResourceInstance, "comment", "Infoblox Terraform Acceptance test - updated"),
 				),
@@ -147,6 +147,7 @@ func testAccInfobloxNSGroupAuthCreateTemplate(name string) string {
 resource "infoblox_ns_group_auth" "acctest" {
 name = "%s"
 comment = "Infoblox Terraform Acceptance test"
+/*
 grid_default_group = true
 use_external_primary = true
 external_primaries = [
@@ -215,6 +216,7 @@ grid_secondaries = [
      stealth = false
   },
 ]
+*/
 }`, name)
 }
 
@@ -223,6 +225,7 @@ func testAccInfobloxNSGroupAuthUpdateTemplate(name string) string {
 resource "infoblox_ns_group_auth" "acctest" {
 name = "%s"
 comment = "Infoblox Terraform Acceptance test - updated"
+/*
 grid_default_group = false
 use_external_primary = false
 external_primaries = [
@@ -291,5 +294,6 @@ grid_secondaries = [
      stealth = true
   },
 ]
+*/
 }`, name)
 }
