@@ -540,6 +540,14 @@
 			"versionExact": "0.0.21"
 		},
 		{
+			"checksumSHA1": "yCmmpWLNOzCkCOX9PoMfD+eDfp8=",
+			"path": "github.com/sky-uk/skyinfoblox/api/nsgroupauth",
+			"revision": "72ab67e0380af6813a1984ab032cdd270135361c",
+			"revisionTime": "2017-08-18T10:23:08Z",
+			"version": "0.0.22",
+			"versionExact": "0.0.22"
+		},
+		{
 			"checksumSHA1": "Ayrr/VJIW36q3ZkHJYfVefjytOQ=",
 			"path": "github.com/sky-uk/skyinfoblox/api/permission",
 			"revision": "f86d7057ddb46432a78aabb0f3acb0c8c05b4d17",
