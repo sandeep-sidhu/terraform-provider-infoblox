@@ -32,15 +32,15 @@ func TestAccInfobloxNSGroupAuthBasic(t *testing.T) {
 				ExpectError: regexp.MustCompile(`required field is not set`),
 			},
 			{
-				Config:      testAccInfobloxNSGroupAuthNameLeadingTrailingSpaces(),
+				Config: testAccInfobloxNSGroupAuthNameLeadingTrailingSpaces(),
 				ExpectError: regexp.MustCompile(`must not contain trailing or leading white space`),
 			},
 			{
-				Config:      testAccInfobloxNSGroupAuthCommentLeadingTrailingSpaces(),
+				Config: testAccInfobloxNSGroupAuthCommentLeadingTrailingSpaces(),
 				ExpectError: regexp.MustCompile(`must not contain trailing or leading white space`),
 			},
 			{
-				Config: testAccInfobloxNSGroupAuthCreateTemplate(nsGroupAuthNameCreate),
+				Config: testAccInfobloxNSGroupAuthCreateTemplate(nsGroupAuthResourceInstance),
 				Check: resource.ComposeTestCheckFunc(
 					testAccInfobloxNSGroupAuthCheckExists(nsGroupAuthNameCreate, nsGroupAuthResourceInstance),
 					resource.TestCheckResourceAttr(nsGroupAuthResourceInstance, "name", nsGroupAuthNameCreate),

@@ -21,13 +21,13 @@ func resourceNSGroupAuth() *schema.Resource {
 				Type:         schema.TypeString,
 				Description:  "The name of the NS Group",
 				Required:     true,
-				ValidateFunc: util.ValidateZoneAuthCheckLeadingTrailingSpaces,
+				ValidateFunc: util.CheckLeadingTrailingSpaces,
 			},
 			"comment": {
 				Type:         schema.TypeString,
 				Description:  "Comment field",
 				Optional:     true,
-				ValidateFunc: util.ValidateZoneAuthCheckLeadingTrailingSpaces,
+				ValidateFunc: util.CheckLeadingTrailingSpaces,
 			},
 			"grid_default_group": {
 				Type:        schema.TypeBool,
@@ -125,7 +125,6 @@ func resourceNSGroupAuthRead(d *schema.ResourceData, m interface{}) error {
 	}
 
 	response := *getNSGroupAuthAPI.ResponseObject().(*nsgroupauth.NSGroupAuth)
-
 	d.SetId(response.Reference)
 	d.Set("name", response.Name)
 	d.Set("comment", response.Comment)
@@ -236,7 +235,6 @@ func resourceNSGroupAuthUpdate(d *schema.ResourceData, m interface{}) error {
 		d.Set("grid_primary", util.BuildMemberServerListFromIBX(response.GridPrimary))
 		d.Set("grid_secondaries", util.BuildMemberServerListFromIBX(response.GridSecondaries))
 	}
-
 	return resourceNSGroupAuthRead(d, m)
 }
 
