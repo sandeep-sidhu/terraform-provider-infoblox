@@ -1,11 +1,11 @@
 package infoblox
 
 import (
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sky-uk/terraform-provider-infoblox/infoblox/util"
-	"github.com/sky-uk/skyinfoblox/api/nsgroupauth"
-	"github.com/sky-uk/skyinfoblox"
 	"fmt"
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/sky-uk/skyinfoblox"
+	"github.com/sky-uk/skyinfoblox/api/nsgroupauth"
+	"github.com/sky-uk/terraform-provider-infoblox/infoblox/util"
 	"net/http"
 )
 

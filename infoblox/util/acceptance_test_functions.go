@@ -7,7 +7,7 @@ import (
 	"regexp"
 )
 
-// Function is used by acceptance tests where we want to check for a value in a set
+// AccTestCheckValueInKeyPattern : Function is used by acceptance tests where we want to check for a value in a set
 func AccTestCheckValueInKeyPattern(resourceName string, keyPattern *regexp.Regexp, checkValue string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 
