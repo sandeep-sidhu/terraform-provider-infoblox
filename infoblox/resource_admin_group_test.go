@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/sky-uk/skyinfoblox"
 	"github.com/sky-uk/skyinfoblox/api/admingroup"
+	"github.com/sky-uk/terraform-provider-infoblox/infoblox/util"
 	"regexp"
 	"testing"
 )
@@ -40,15 +41,15 @@ func TestAccInfobloxAdminGroupBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(adminGroupResource, "comment", "Infoblox Terraform Acceptance test"),
 					resource.TestCheckResourceAttr(adminGroupResource, "superuser", "true"),
 					resource.TestCheckResourceAttr(adminGroupResource, "disable", "true"),
-					resource.TestCheckResourceAttr(adminGroupResource, "access_method.#", "3"),
-					resource.TestCheckResourceAttr(adminGroupResource, "access_method.0", "GUI"),
-					resource.TestCheckResourceAttr(adminGroupResource, "access_method.1", "API"),
-					resource.TestCheckResourceAttr(adminGroupResource, "access_method.2", "TAXII"),
-					resource.TestCheckResourceAttr(adminGroupResource, "email_addresses.#", "4"),
-					testAccInfobloxAdminGroupCheckValueInKeyPattern(adminGroupResource, emailAddressKeyPattern, "user.one@example.com"),
-					testAccInfobloxAdminGroupCheckValueInKeyPattern(adminGroupResource, emailAddressKeyPattern, "user.two@example.com"),
-					testAccInfobloxAdminGroupCheckValueInKeyPattern(adminGroupResource, emailAddressKeyPattern, "user.three@example.com"),
-					testAccInfobloxAdminGroupCheckValueInKeyPattern(adminGroupResource, emailAddressKeyPattern, "user.four@example.com"),
+					resource.TestCheckResourceAttr(adminGroupResource, "access-method.#", "3"),
+					resource.TestCheckResourceAttr(adminGroupResource, "access-method.0", "GUI"),
+					resource.TestCheckResourceAttr(adminGroupResource, "access-method.1", "API"),
+					resource.TestCheckResourceAttr(adminGroupResource, "access-method.2", "TAXII"),
+					resource.TestCheckResourceAttr(adminGroupResource, "email-addresses.#", "4"),
+					util.AccTestCheckValueInKeyPattern(adminGroupResource, emailAddressKeyPattern, "user.one@example.com"),
+					util.AccTestCheckValueInKeyPattern(adminGroupResource, emailAddressKeyPattern, "user.two@example.com"),
+					util.AccTestCheckValueInKeyPattern(adminGroupResource, emailAddressKeyPattern, "user.three@example.com"),
+					util.AccTestCheckValueInKeyPattern(adminGroupResource, emailAddressKeyPattern, "user.four@example.com"),
 					resource.TestCheckResourceAttr(adminGroupResource, "roles.#", "2"),
 					resource.TestCheckResourceAttr(adminGroupResource, "roles.0", "DNS Admin"),
 					resource.TestCheckResourceAttr(adminGroupResource, "roles.1", "DHCP Admin"),
@@ -62,39 +63,22 @@ func TestAccInfobloxAdminGroupBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(adminGroupResource, "comment", "Infoblox Terraform Acceptance test - updated"),
 					resource.TestCheckResourceAttr(adminGroupResource, "superuser", "false"),
 					resource.TestCheckResourceAttr(adminGroupResource, "disable", "false"),
-					resource.TestCheckResourceAttr(adminGroupResource, "access_method.#", "3"),
-					resource.TestCheckResourceAttr(adminGroupResource, "access_method.0", "GUI"),
-					resource.TestCheckResourceAttr(adminGroupResource, "access_method.1", "API"),
-					resource.TestCheckResourceAttr(adminGroupResource, "access_method.2", "TAXII"),
-					resource.TestCheckResourceAttr(adminGroupResource, "email_addresses.#", "5"),
-					testAccInfobloxAdminGroupCheckValueInKeyPattern(adminGroupResource, emailAddressKeyPattern, "user.one@example.com"),
-					testAccInfobloxAdminGroupCheckValueInKeyPattern(adminGroupResource, emailAddressKeyPattern, "user.two@example.com"),
-					testAccInfobloxAdminGroupCheckValueInKeyPattern(adminGroupResource, emailAddressKeyPattern, "user.three@example.com"),
-					testAccInfobloxAdminGroupCheckValueInKeyPattern(adminGroupResource, emailAddressKeyPattern, "user.four@example.com"),
-					testAccInfobloxAdminGroupCheckValueInKeyPattern(adminGroupResource, emailAddressKeyPattern, "user.five@example.com"),
+					resource.TestCheckResourceAttr(adminGroupResource, "access-method.#", "3"),
+					resource.TestCheckResourceAttr(adminGroupResource, "access-method.0", "GUI"),
+					resource.TestCheckResourceAttr(adminGroupResource, "access-method.1", "API"),
+					resource.TestCheckResourceAttr(adminGroupResource, "access-method.2", "TAXII"),
+					resource.TestCheckResourceAttr(adminGroupResource, "email-addresses.#", "5"),
+					util.AccTestCheckValueInKeyPattern(adminGroupResource, emailAddressKeyPattern, "user.one@example.com"),
+					util.AccTestCheckValueInKeyPattern(adminGroupResource, emailAddressKeyPattern, "user.two@example.com"),
+					util.AccTestCheckValueInKeyPattern(adminGroupResource, emailAddressKeyPattern, "user.three@example.com"),
+					util.AccTestCheckValueInKeyPattern(adminGroupResource, emailAddressKeyPattern, "user.four@example.com"),
+					util.AccTestCheckValueInKeyPattern(adminGroupResource, emailAddressKeyPattern, "user.five@example.com"),
 					resource.TestCheckResourceAttr(adminGroupResource, "roles.#", "1"),
 					resource.TestCheckResourceAttr(adminGroupResource, "roles.0", "DHCP Admin"),
 				),
 			},
 		},
 	})
-}
-
-func testAccInfobloxAdminGroupCheckValueInKeyPattern(adminGroupResource string, keyPattern *regexp.Regexp, checkValue string) resource.TestCheckFunc {
-	return func(state *terraform.State) error {
-
-		rs, ok := state.RootModule().Resources[adminGroupResource]
-		if ok {
-			for attributeKey, attributeValue := range rs.Primary.Attributes {
-				if keyPattern.MatchString(attributeKey) {
-					if attributeValue == checkValue {
-						return nil
-					}
-				}
-			}
-		}
-		return fmt.Errorf("Infoblox Admin Group attribute %s not found", checkValue)
-	}
 }
 
 func testAccInfobloxAdminGroupCheckDestroy(state *terraform.State, adminGroupName string) error {
