@@ -59,6 +59,7 @@ func Provider() terraform.ResourceProvider {
 			"infoblox_permission":     resourcePermission(),
 			"infoblox_zone_stub":      resourceZoneStub(),
 			"infoblox_zone_forward":   resourceZoneForward(),
+			"infoblox_ns_group_auth":  resourceNSGroupAuth(),
 		},
 		ConfigureFunc: providerConfigure,
 	}
