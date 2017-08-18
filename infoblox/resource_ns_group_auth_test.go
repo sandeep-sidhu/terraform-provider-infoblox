@@ -40,7 +40,7 @@ func TestAccInfobloxNSGroupAuthBasic(t *testing.T) {
 				ExpectError: regexp.MustCompile(`must not contain trailing or leading white space`),
 			},
 			{
-				Config: testAccInfobloxNSGroupAuthCreateTemplate(nsGroupAuthResourceInstance),
+				Config: testAccInfobloxNSGroupAuthCreateTemplate(nsGroupAuthNameCreate),
 				Check: resource.ComposeTestCheckFunc(
 					testAccInfobloxNSGroupAuthCheckExists(nsGroupAuthNameCreate, nsGroupAuthResourceInstance),
 					resource.TestCheckResourceAttr(nsGroupAuthResourceInstance, "name", nsGroupAuthNameCreate),
