@@ -45,6 +45,10 @@ func TestAccInfobloxNSGroupAuthBasic(t *testing.T) {
 					testAccInfobloxNSGroupAuthCheckExists(nsGroupAuthNameCreate, nsGroupAuthResourceInstance),
 					resource.TestCheckResourceAttr(nsGroupAuthResourceInstance, "name", nsGroupAuthNameCreate),
 					resource.TestCheckResourceAttr(nsGroupAuthResourceInstance, "comment", "Infoblox Terraform Acceptance test"),
+					// There can only be one default setting acceptance test to false in all cases to avoid impacting existing default group.
+					resource.TestCheckResourceAttr(nsGroupAuthResourceInstance, "grid_default_group", "false"),
+					resource.TestCheckResourceAttr(nsGroupAuthResourceInstance, "use_external_primary", "false"),
+					// TODO - we need a method of setting real data without it being on a public repo. Implement other attributes.
 				),
 			},
 			{
@@ -53,6 +57,10 @@ func TestAccInfobloxNSGroupAuthBasic(t *testing.T) {
 					testAccInfobloxNSGroupAuthCheckExists(nsGroupAuthNameUpdate, nsGroupAuthResourceInstance),
 					resource.TestCheckResourceAttr(nsGroupAuthResourceInstance, "name", nsGroupAuthNameUpdate),
 					resource.TestCheckResourceAttr(nsGroupAuthResourceInstance, "comment", "Infoblox Terraform Acceptance test - updated"),
+					// There can only be one default setting acceptance test to false in all cases to avoid impacting existing default group.
+					resource.TestCheckResourceAttr(nsGroupAuthResourceInstance, "grid_default_group", "false"),
+					resource.TestCheckResourceAttr(nsGroupAuthResourceInstance, "use_external_primary", "false"),
+					// TODO - we need a method of setting real data without it being on a public repo. Implement other attributes.
 				),
 			},
 		},
@@ -114,8 +122,8 @@ func testAccInfobloxNSGroupAuthNoNameTemplate() string {
 	return fmt.Sprintf(`
 resource "infoblox_ns_group_auth" "acctest" {
 comment = "Infoblox Terraform Acceptance test"
-grid_default_group = true
-use_external_primary = true
+grid_default_group = false
+use_external_primary = false
 }
 `)
 }
@@ -125,8 +133,8 @@ func testAccInfobloxNSGroupAuthNameLeadingTrailingSpaces() string {
 resource "infoblox_ns_group_auth" "acctest" {
 name = " test-group "
 comment = "Infoblox Terraform Acceptance test"
-grid_default_group = true
-use_external_primary = true
+grid_default_group = false
+use_external_primary = false
 }
 `)
 }
@@ -136,8 +144,8 @@ func testAccInfobloxNSGroupAuthCommentLeadingTrailingSpaces() string {
 resource "infoblox_ns_group_auth" "acctest" {
 name = "test-group"
 comment = " Infoblox Terraform Acceptance test "
-grid_default_group = true
-use_external_primary = true
+grid_default_group = false
+use_external_primary = false
 }
 `)
 }
@@ -147,8 +155,8 @@ func testAccInfobloxNSGroupAuthCreateTemplate(name string) string {
 resource "infoblox_ns_group_auth" "acctest" {
 name = "%s"
 comment = "Infoblox Terraform Acceptance test"
-/*
-grid_default_group = true
+/*  TODO - we need a method of setting real data without it being on a public repo.
+grid_default_group = false
 use_external_primary = true
 external_primaries = [
  {
@@ -225,9 +233,9 @@ func testAccInfobloxNSGroupAuthUpdateTemplate(name string) string {
 resource "infoblox_ns_group_auth" "acctest" {
 name = "%s"
 comment = "Infoblox Terraform Acceptance test - updated"
-/*
+/*  TODO - we need a method of setting real data without it being on a public repo.
 grid_default_group = false
-use_external_primary = false
+use_external_primary = true
 external_primaries = [
  {
      address = "192.168.10.1"
