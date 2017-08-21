@@ -58,6 +58,42 @@ func resourceNSGroupAuthCreate(d *schema.ResourceData, m interface{}) error {
 	if v, ok := d.GetOk("comment"); ok && v != "" {
 		nsGroupAuth.Comment = v.(string)
 	}
+	if v, _ := d.GetOk("grid_default_group"); v != nil {
+		gridDefaultGroup := v.(bool)
+		nsGroupAuth.GridDefault = &gridDefaultGroup
+	}
+	if v, ok := d.GetOk("use_external_primary"); ok && v != nil {
+		useExternalPrimary := v.(bool)
+		nsGroupAuth.UseExternalPrimary = &useExternalPrimary
+	}
+	if v, ok := d.GetOk("external_primaries"); ok && v != nil {
+		servers := []map[string]interface{}{}
+		for _, server := range v.([]interface{}) {
+			servers = append(servers, server.(map[string]interface{}))
+		}
+		nsGroupAuth.ExternalPrimaries = util.BuildExternalServerListFromT(servers)
+	}
+	if v, ok := d.GetOk("external_secondaries"); ok && v != nil {
+		servers := []map[string]interface{}{}
+		for _, server := range v.([]interface{}) {
+			servers = append(servers, server.(map[string]interface{}))
+		}
+		nsGroupAuth.ExternalSecondaries = util.BuildExternalServerListFromT(servers)
+	}
+	if v, ok := d.GetOk("grid_primary"); ok && v != nil {
+		servers := []map[string]interface{}{}
+		for _, server := range v.([]interface{}) {
+			servers = append(servers, server.(map[string]interface{}))
+		}
+		nsGroupAuth.GridPrimary = util.BuildMemberServerListFromT(servers)
+	}
+	if v, ok := d.GetOk("grid_secondaries"); ok && v != nil {
+		servers := []map[string]interface{}{}
+		for _, server := range v.([]interface{}) {
+			servers = append(servers, server.(map[string]interface{}))
+		}
+		nsGroupAuth.GridSecondaries = util.BuildMemberServerListFromT(servers)
+	}
 
 	createAPI := nsgroupauth.NewCreate(nsGroupAuth)
 	err := client.Do(createAPI)
@@ -95,10 +131,10 @@ func resourceNSGroupAuthRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("comment", response.Comment)
 	d.Set("grid_default_group", *response.GridDefault)
 	d.Set("use_external_primary", *response.UseExternalPrimary)
-	d.Set("external_primaries", response.ExternalPrimaries)
-	d.Set("external_secondaries", response.ExternalSecondaries)
-	d.Set("grid_primary", response.GridPrimary)
-	d.Set("grid_secondaries", response.GridSecondaries)
+	d.Set("external_primaries", util.BuildExternalServersListFromIBX(response.ExternalPrimaries))
+	d.Set("external_secondaries", util.BuildExternalServersListFromIBX(response.ExternalSecondaries))
+	d.Set("grid_primary", util.BuildMemberServerListFromIBX(response.GridPrimary))
+	d.Set("grid_secondaries", util.BuildMemberServerListFromIBX(response.GridSecondaries))
 
 	return nil
 }
@@ -117,6 +153,60 @@ func resourceNSGroupAuthUpdate(d *schema.ResourceData, m interface{}) error {
 	if d.HasChange("comment") {
 		if v, ok := d.GetOk("comment"); ok && v != "" {
 			nsGroupAuth.Comment = v.(string)
+		}
+		hasChanges = true
+	}
+	if d.HasChange("grid_default_group") {
+		if v, ok := d.GetOk("grid_default_group"); ok && v != nil {
+			gridDefaultGroup := v.(bool)
+			nsGroupAuth.GridDefault = &gridDefaultGroup
+		}
+		hasChanges = true
+	}
+	if d.HasChange("use_external_primary") {
+		if v, ok := d.GetOk("use_external_primary"); ok && v != nil {
+			useExternalPrimary := v.(bool)
+			nsGroupAuth.UseExternalPrimary = &useExternalPrimary
+		}
+		hasChanges = true
+	}
+	if d.HasChange("external_primaries") {
+		if v, ok := d.GetOk("external_primaries"); ok && v != nil {
+			servers := []map[string]interface{}{}
+			for _, server := range v.([]interface{}) {
+				servers = append(servers, server.(map[string]interface{}))
+			}
+			nsGroupAuth.ExternalPrimaries = util.BuildExternalServerListFromT(servers)
+		}
+		hasChanges = true
+	}
+	if d.HasChange("external_secondaries") {
+		if v, ok := d.GetOk("external_secondaries"); ok && v != nil {
+			servers := []map[string]interface{}{}
+			for _, server := range v.([]interface{}) {
+				servers = append(servers, server.(map[string]interface{}))
+			}
+			nsGroupAuth.ExternalSecondaries = util.BuildExternalServerListFromT(servers)
+		}
+		hasChanges = true
+	}
+	if d.HasChange("grid_primary") {
+		if v, ok := d.GetOk("grid_primary"); ok && v != nil {
+			servers := []map[string]interface{}{}
+			for _, server := range v.([]interface{}) {
+				servers = append(servers, server.(map[string]interface{}))
+			}
+			nsGroupAuth.GridPrimary = util.BuildMemberServerListFromT(servers)
+		}
+		hasChanges = true
+	}
+	if d.HasChange("grid_secondaries") {
+		if v, ok := d.GetOk("grid_secondaries"); ok && v != nil {
+			servers := []map[string]interface{}{}
+			for _, server := range v.([]interface{}) {
+				servers = append(servers, server.(map[string]interface{}))
+			}
+			nsGroupAuth.GridSecondaries = util.BuildMemberServerListFromT(servers)
 		}
 		hasChanges = true
 	}
@@ -139,6 +229,12 @@ func resourceNSGroupAuthUpdate(d *schema.ResourceData, m interface{}) error {
 		d.SetId(response.Reference)
 		d.Set("name", response.Name)
 		d.Set("comment", response.Comment)
+		d.Set("grid_default_group", *response.GridDefault)
+		d.Set("use_external_primary", *response.UseExternalPrimary)
+		d.Set("external_primaries", util.BuildExternalServersListFromIBX(response.ExternalPrimaries))
+		d.Set("external_secondaries", util.BuildExternalServersListFromIBX(response.ExternalSecondaries))
+		d.Set("grid_primary", util.BuildMemberServerListFromIBX(response.GridPrimary))
+		d.Set("grid_secondaries", util.BuildMemberServerListFromIBX(response.GridSecondaries))
 	}
 
 	return resourceNSGroupAuthRead(d, m)
