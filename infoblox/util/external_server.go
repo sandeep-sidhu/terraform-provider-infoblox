@@ -42,9 +42,10 @@ func ExternalServerListSchema(optional, required bool) *schema.Schema {
 					Default:     "",
 				},
 				"tsig_key_alg": {
-					Type:        schema.TypeString,
-					Description: "The TSIG key algorithm. Valid values: HMAC-MD5 or HMAC-SHA256. The default value is HMAC-MD5.",
-					Optional:    true,
+					Type:         schema.TypeString,
+					Description:  "The TSIG key algorithm. Valid values: HMAC-MD5 or HMAC-SHA256. The default value is HMAC-MD5.",
+					Optional:     true,
+					ValidateFunc: ValidateTSIGAlgorithm,
 				},
 				"tsig_key_name": {
 					Type:        schema.TypeString,
