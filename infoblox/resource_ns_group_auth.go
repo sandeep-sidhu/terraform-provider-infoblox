@@ -21,13 +21,13 @@ func resourceNSGroupAuth() *schema.Resource {
 				Type:         schema.TypeString,
 				Description:  "The name of the NS Group",
 				Required:     true,
-				ValidateFunc: util.ValidateZoneAuthCheckLeadingTrailingSpaces,
+				ValidateFunc: util.CheckLeadingTrailingSpaces,
 			},
 			"comment": {
 				Type:         schema.TypeString,
 				Description:  "Comment field",
 				Optional:     true,
-				ValidateFunc: util.ValidateZoneAuthCheckLeadingTrailingSpaces,
+				ValidateFunc: util.CheckLeadingTrailingSpaces,
 			},
 			"grid_default_group": {
 				Type:        schema.TypeBool,
