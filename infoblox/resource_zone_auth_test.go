@@ -337,6 +337,7 @@ dns_integrity_member = "nonprdibxdns01.bskyb.com"
 locked = true
 copy_xfer_to_notify = false
 use_copy_xfer_to_notify = false
+use_external_primary = false
 allow_update = [
 {
   type = "addressac"
@@ -378,6 +379,18 @@ locked = false
 copy_xfer_to_notify = true
 use_copy_xfer_to_notify = true
 use_allow_transfer = false
+use_external_primary = true
+external_primaries = [
+        {
+            address = “10.0.0.2”
+            name = “ns1.example.com”
+            stealth = false
+            tsig_key = "dFghJkcXb5tyUio3eWo021=="
+            tsig_key_alg = "HMAC-SHA256"
+            tsig_key_name = “example-key“
+            use_tsig_key_name = true
+        },
+    ]
 allow_transfer = [
       {
         type = "addressac"
@@ -440,6 +453,7 @@ dns_integrity_enable = false
 dns_integrity_member = "nonprdibxdns01.bskyb.com"
 locked = false
 use_allow_transfer = true
+
 allow_update = [
 {
   type = "tsigac"

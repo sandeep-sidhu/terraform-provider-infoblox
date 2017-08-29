@@ -166,6 +166,11 @@ func resourceZoneAuth() *schema.Resource {
 				Default:     false,
 				Optional:    true,
 			},
+			"use_external_primary": {
+				Type:        schema.TypeBool,
+				Description: "This flag controls whether the zone is using an external primary.",
+				Optional:    true,
+			},
 			"allow_update":   util.AccessControlSchema(),
 			"allow_transfer": util.AccessControlSchema(),
 			"use_allow_transfer": {
@@ -304,6 +309,10 @@ func resourceZoneAuthCreate(d *schema.ResourceData, m interface{}) error {
 		useCheckNamesPolicy := v.(bool)
 		dnsZone.UseCheckNamesPolicy = &useCheckNamesPolicy
 	}
+	if v, ok := d.GetOk("use_external_primary"); ok {
+		useExternalPrimary := v.(bool)
+		dnsZone.UseExternalPrimary = &useExternalPrimary
+	}
 
 	createAPI := zoneauth.NewCreate(dnsZone)
 	err := infobloxClient.Do(createAPI)
@@ -331,7 +340,7 @@ func resourceZoneAuthCreate(d *schema.ResourceData, m interface{}) error {
 }
 
 func returnFields() []string {
-	return []string{"fqdn", "comment", "zone_format", "view", "prefix", "soa_serial_number", "soa_default_ttl", "soa_negative_ttl", "soa_refresh", "soa_retry", "soa_expire", "copy_xfer_to_notify", "use_copy_xfer_to_notify", "disable", "dns_integrity_enable", "dns_integrity_member", "external_primaries", "external_secondaries", "grid_primary", "grid_secondaries", "grid_primary_shared_with_ms_parent_delegation", "locked", "locked_by", "network_view", "ns_group", "allow_update", "allow_transfer", "use_check_names_policy"}
+	return []string{"fqdn", "comment", "zone_format", "view", "prefix", "soa_serial_number", "soa_default_ttl", "soa_negative_ttl", "soa_refresh", "soa_retry", "soa_expire", "copy_xfer_to_notify", "use_copy_xfer_to_notify", "disable", "dns_integrity_enable", "dns_integrity_member", "external_primaries", "external_secondaries", "grid_primary", "grid_secondaries", "grid_primary_shared_with_ms_parent_delegation", "locked", "locked_by", "network_view", "ns_group", "allow_update", "allow_transfer", "use_check_names_policy", "use_external_primary"}
 }
 
 func resourceZoneAuthRead(d *schema.ResourceData, m interface{}) error {
@@ -381,6 +390,7 @@ func resourceZoneAuthRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("copy_xfer_to_notify", response.CopyXferToNotify)
 	d.Set("use_copy_xfer_to_notify", response.UseCopyXferNotify)
 	d.Set("use_check_names_policy", response.UseCheckNamesPolicy)
+	d.Set("use_external_primary", response.UseExternalPrimary)
 	d.Set("allow_update", response.AllowUpdate)
 	d.Set("allow_transfer", response.AllowTransfer)
 	return nil
@@ -534,6 +544,11 @@ func resourceZoneAuthUpdate(d *schema.ResourceData, m interface{}) error {
 	if d.HasChange("use_check_names_policy") {
 		useCheckNamesPolicy := d.Get("use_check_names_policy").(bool)
 		updateZoneAuth.UseCheckNamesPolicy = &useCheckNamesPolicy
+		hasChanges = true
+	}
+	if d.HasChange("use_external_primary") {
+		useExternalPrimary := d.Get("use_external_primary").(bool)
+		updateZoneAuth.UseExternalPrimary = &useExternalPrimary
 		hasChanges = true
 	}
 	if d.HasChange("allow_update") {
