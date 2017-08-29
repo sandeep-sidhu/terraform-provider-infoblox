@@ -392,6 +392,14 @@ external_primaries = [
             use_tsig_key_name = true
         },
     ]
+grid_secondaries = [
+        {
+            lead = false
+            name = "slunonprdigm01.bskyb.com"
+            enablepreferredprimaries = false
+            stealth = false
+        },
+    ]
 allow_transfer = [
       {
         type = "addressac"
