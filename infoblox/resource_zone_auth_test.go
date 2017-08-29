@@ -382,12 +382,12 @@ use_allow_transfer = false
 use_external_primary = true
 external_primaries = [
         {
-            address = “10.0.0.2”
-            name = “ns1.example.com”
+            address = "10.0.0.2"
+            name = "ns1.example.com"
             stealth = false
             tsig_key = "dFghJkcXb5tyUio3eWo021=="
             tsig_key_alg = "HMAC-SHA256"
-            tsig_key_name = “example-key“
+            tsig_key_name = "example-key"
             use_tsig_key_name = true
         },
     ]
