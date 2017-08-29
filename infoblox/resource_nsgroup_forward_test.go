@@ -1,5 +1,6 @@
 package infoblox
 
+/* Uncomment acceptance test once testing environment available.
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/acctest"
@@ -33,7 +34,7 @@ func TestAccInfobloxNSGroupForwardBasic(t *testing.T) {
 			},
 			{
 				Config:      testAccInfobloxNSGroupForwardCommentLeadingTrailingSpaces(nsGroupForwardName),
-				ExpectError: regexp.MustCompile(`xmust not contain trailing or leading white space`),
+				ExpectError: regexp.MustCompile(`must not contain trailing or leading white space`),
 			},
 			{
 				Config: testAccInfobloxNSGroupForwardCreateTemplate(nsGroupForwardName),
@@ -41,6 +42,22 @@ func TestAccInfobloxNSGroupForwardBasic(t *testing.T) {
 					testAccInfobloxNSGroupForwardCheckExists(nsGroupForwardName, nsGroupForwardResourceInstance),
 					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "name", nsGroupForwardName),
 					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "comment", "Infoblox Terraform Acceptance test"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.0.forward_to.#", "2"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.0.forward_to.0.name", "ns1.example.com"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.0.forward_to.0.address", "192.168.1.3"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.0.forward_to.1.name", "ns2.example.com"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.0.forward_to.1.address", "192.168.1.4"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.0.forwarders_only", "true"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.0.name", "grid-member01.example.com"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.0.use_override_forwarders", "true"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.1.forward_to.#", "2"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.1.forward_to.0.name", "ns11.example.com"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.1.forward_to.0.address", "192.168.2.3"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.1.forward_to.1.name", "ns12.example.com"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.1.forward_to.1.address", "192.168.2.4"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.1.forwarders_only", "true"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.1.name", "grid-member02.example.com"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.1.use_override_forwarders", "true"),
 				),
 			},
 			{
@@ -49,6 +66,24 @@ func TestAccInfobloxNSGroupForwardBasic(t *testing.T) {
 					testAccInfobloxNSGroupForwardCheckExists(nsGroupNameForwardUpdate, nsGroupForwardResourceInstance),
 					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "name", nsGroupNameForwardUpdate),
 					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "comment", "Infoblox Terraform Acceptance test - updated"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.0.forward_to.#", "3"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.0.forward_to.0.name", "ns100.example.com"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.0.forward_to.0.address", "192.168.100.3"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.0.forward_to.1.name", "ns101.example.com"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.0.forward_to.1.address", "192.168.100.4"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.0.forward_to.2.name", "ns102.example.com"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.0.forward_to.2.address", "192.168.100.5"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.1.forwarders_only", "true"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.0.name", "grid-member02.example.com"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.0.use_override_forwarders", "true"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.1.forward_to.#", "2"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.1.forward_to.0.name", "ns200.example.com"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.1.forward_to.0.address", "192.168.200.3"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.1.forward_to.1.name", "ns201.example.com"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.1.forward_to.1.address", "192.168.200.4"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.1.forwarders_only", "true"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.1.name", "grid-member01.example.com"),
+					resource.TestCheckResourceAttr(nsGroupForwardResourceInstance, "forwarding_servers.1.use_override_forwarders", "true"),
 				),
 			},
 		},
@@ -69,7 +104,7 @@ func testAccInfobloxNSGroupForwardCheckDestroy(state *terraform.State, name stri
 		api := nsgroupfwd.NewGetAll()
 		err := client.Do(api)
 		if err != nil {
-			return fmt.Errorf("Infoblox - error occurred whilst retrieving a list of NS Group Foward")
+			return fmt.Errorf("Infoblox - error occurred whilst retrieving a list of NS Group Forward")
 		}
 		for _, nsGroupForward := range *api.ResponseObject().(*[]nsgroupfwd.NSGroupFwd) {
 			if nsGroupForward.Name == name {
@@ -141,7 +176,7 @@ resource "infoblox_ns_group_forward" "acctest" {
         },
       ],
       forwarders_only = true
-      name = ""
+      name = "grid-member01.example.com"
       use_override_forwarders = true
     },
     {
@@ -156,7 +191,7 @@ resource "infoblox_ns_group_forward" "acctest" {
         },
       ],
       forwarders_only = true
-      name = ""
+      name = "grid-member02.example.com"
       use_override_forwarders = true
     },
   ],
@@ -169,6 +204,44 @@ func testAccInfobloxNSGroupForwardUpdateTemplate(name string) string {
 resource "infoblox_ns_group_forward" "acctest" {
   name = "%s"
   comment = "Infoblox Terraform Acceptance test - updated"
+    forwarding_servers = [
+    {
+      forward_to = [
+        {
+	  name = "ns100.example.com"
+	  address = "192.168.100.3"
+        },
+        {
+	  name = "ns101.example.com"
+	  address = "192.168.100.4"
+        },
+        {
+	  name = "ns102.example.com"
+	  address = "192.168.100.5"
+        },
+      ],
+      forwarders_only = true
+      name = "grid-member02.example.com"
+      use_override_forwarders = true
+    },
+    {
+      forward_to = [
+        {
+	  name = "ns200.example.com"
+	  address = "192.168.200.3"
+        },
+        {
+	  name = "ns201.example.com"
+	  address = "192.168.200.4"
+        },
+      ],
+      forwarders_only = true
+      name = "grid-member01.example.com"
+      use_override_forwarders = true
+    },
+  ],
+
 }
 `, name)
 }
+*/

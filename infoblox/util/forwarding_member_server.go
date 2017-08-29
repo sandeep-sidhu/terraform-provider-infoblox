@@ -75,10 +75,10 @@ func BuildForwardingMemberServerListFromT(serverListFromT []map[string]interface
 
 // BuildForwardingMemberServerListFromIBX -  builds a list of forwarding member servers for terraform given
 // the corresponding struct from IBX
-func BuildForwardingMemberServerListFromIBX(IBXFwdMemberServerList []common.ForwardingMemberServer) []map[string]interface{} {
+func BuildForwardingMemberServerListFromIBX(ibxFwdMemberServerList []common.ForwardingMemberServer) []map[string]interface{} {
 
 	forwardMemberServers := make([]map[string]interface{}, 0)
-	for _, fwdMemberServer := range IBXFwdMemberServerList {
+	for _, fwdMemberServer := range ibxFwdMemberServerList {
 		server := make(map[string]interface{})
 
 		if fwdMemberServer.Name != "" {
