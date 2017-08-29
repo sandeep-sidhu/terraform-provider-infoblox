@@ -116,6 +116,7 @@ func TestAccInfobloxZoneAuthBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(testFQDNResourceName, "locked", "false"),
 					resource.TestCheckResourceAttr(testFQDNResourceName, "copy_xfer_to_notify", "true"),
 					resource.TestCheckResourceAttr(testFQDNResourceName, "use_copy_xfer_to_notify", "true"),
+					resource.TestCheckResourceAttr(testFQDNResourceName, "use_external_primary", "true"),
 					resource.TestCheckResourceAttr(testFQDNResourceName, "allow_update.0.type", "tsigac"),
 					resource.TestCheckResourceAttr(testFQDNResourceName, "allow_update.0.tsig_key", "0jnu3SdsMvzzlmToPYRceA=="),
 					resource.TestCheckResourceAttr(testFQDNResourceName, "allow_update.0.tsig_key_alg", "HMAC-MD5"),
