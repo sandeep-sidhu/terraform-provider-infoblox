@@ -541,16 +541,19 @@ func resourceZoneAuthUpdate(d *schema.ResourceData, m interface{}) error {
 		updateZoneAuth.UseCopyXferNotify = &useCopyXferToNotify
 		hasChanges = true
 	}
+
 	if d.HasChange("use_check_names_policy") {
 		useCheckNamesPolicy := d.Get("use_check_names_policy").(bool)
 		updateZoneAuth.UseCheckNamesPolicy = &useCheckNamesPolicy
 		hasChanges = true
 	}
+
 	if d.HasChange("use_external_primary") {
 		useExternalPrimary := d.Get("use_external_primary").(bool)
 		updateZoneAuth.UseExternalPrimary = &useExternalPrimary
 		hasChanges = true
 	}
+
 	if d.HasChange("allow_update") {
 		if v, ok := d.GetOk("allow_update"); ok && v != nil {
 			updateZoneAuth.AllowUpdate = util.BuildAcList(v.([]interface{}))
